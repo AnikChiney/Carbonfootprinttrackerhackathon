@@ -1,13 +1,6 @@
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
-if "emissions" not in st.session_state:
-    st.session_state.emissions = None
-    st.session_state.total_emissions = None
-if "prediction" not in st.session_state:
-    st.session_state.prediction = None
-
-
 
 # ---------------- CONFIG ----------------
 st.set_page_config(
@@ -77,9 +70,6 @@ if st.button("📊 Calculate Carbon Footprint", use_container_width=True):
         distance, electricity, meals, waste, country
     )
 
-    st.session_state.emissions = emissions
-    st.session_state.total_emissions = total_emissions
-
     st.header("📈 Current Results")
 
     c1, c2, c3, c4 = st.columns(4)
@@ -93,63 +83,57 @@ if st.button("📊 Calculate Carbon Footprint", use_container_width=True):
     df = pd.DataFrame.from_dict(emissions, orient="index", columns=["Tonnes CO₂"])
     st.bar_chart(df)
 
-
     # ---------------- PREDICTIVE MODEL ----------------
-    if st.session_state.get("show_prediction", False):
+    st.divider()
+    st.subheader("🔮 Predictive Impact: Lifestyle Changes")
 
-        emissions = st.session_state.emissions
-        total_emissions = st.session_state.total_emissions
-        factors = EMISSION_FACTORS[country]
-    
-        pred_distance = distance * (1 - reduction_transport / 100)
-        pred_electricity = electricity * (1 - reduction_electricity / 100)
-        pred_meals = meals * (1 - reduction_meals / 100)
-    
-        prediction_breakdown = {
-            "Transportation": round(factors["transport"] * pred_distance * 365 / 1000, 2),
-            "Electricity": round(factors["electricity"] * pred_electricity * 12 / 1000, 2),
-            "Diet": round(factors["diet"] * pred_meals * 365 / 1000, 2),
-            "Waste": emissions["Waste"]  # unchanged
-        }
-    
-        pred_total = round(sum(prediction_breakdown.values()), 2)
-    
-        reduction_percent = round(
-            ((total_emissions - pred_total) / total_emissions) * 100, 2
-        )
-    
-        # ✅ STORE everything safely
-        st.session_state.prediction = {
-            "breakdown": prediction_breakdown,
-            "total": pred_total,
-            "reduction_percent": reduction_percent
-        }
-    
-        st.subheader("🤖 AI Insight")
-        st.success(
-            f"With these changes, you can reduce your annual emissions by "
-            f"**{reduction_percent}%**, saving approximately "
-            f"**{round(total_emissions - pred_total, 2)} tonnes CO₂ per year**."
-        )
+    reduction_transport = st.slider("Reduce daily commute (%)", 0, 50, 30)
+    reduction_electricity = st.slider("Reduce electricity usage (%)", 0, 50, 40)
+    reduction_meals = st.slider("Reduce high-carbon meals (%)", 0, 50, 20)
+
+    # Apply reductions
+    pred_distance = distance * (1 - reduction_transport / 100)
+    pred_electricity = electricity * (1 - reduction_electricity / 100)
+    pred_meals = meals * (1 - reduction_meals / 100)
+
+    factors = EMISSION_FACTORS[country]
+
+    pred_transport = factors["transport"] * pred_distance * 365 / 1000
+    pred_electricity = factors["electricity"] * pred_electricity * 12 / 1000
+    pred_diet = factors["diet"] * pred_meals * 365 / 1000
+    pred_waste = emissions["Waste"]  # unchanged
+
+    pred_total = round(
+        pred_transport + pred_electricity + pred_diet + pred_waste, 2
+    )
+
+    reduction_percent = round(
+        ((total_emissions - pred_total) / total_emissions) * 100, 2
+    )
+
+    st.subheader("🤖 AI Insight")
+    st.write(
+        f"With these small changes, you can reduce your annual emissions by "
+        f"**{reduction_percent}%**, saving approximately "
+        f"**{round(total_emissions - pred_total, 2)} tonnes CO₂ per year**."
+    )
 
     # ---------------- COMPARISON CHART ----------------
-    if st.session_state.prediction:
-
-        comparison_df = pd.DataFrame({
-            "Category": ["Transportation", "Electricity", "Diet", "Waste"],
-            "Current": [
-                st.session_state.emissions["Transportation"],
-                st.session_state.emissions["Electricity"],
-                st.session_state.emissions["Diet"],
-                st.session_state.emissions["Waste"]
-            ],
-            "Predicted": [
-                st.session_state.prediction["breakdown"]["Transportation"],
-                st.session_state.prediction["breakdown"]["Electricity"],
-                st.session_state.prediction["breakdown"]["Diet"],
-                st.session_state.prediction["breakdown"]["Waste"]
-            ]
-        })
+    comparison_df = pd.DataFrame({
+        "Category": ["Transportation", "Electricity", "Diet", "Waste"],
+        "Current": [
+            emissions["Transportation"],
+            emissions["Electricity"],
+            emissions["Diet"],
+            emissions["Waste"]
+        ],
+        "Predicted": [
+            round(pred_transport, 2),
+            round(pred_electricity, 2),
+            round(pred_diet, 2),
+            pred_waste
+        ]
+    })
 
     st.subheader("📊 Current vs Predicted Emissions")
 
@@ -172,7 +156,6 @@ if st.button("📊 Calculate Carbon Footprint", use_container_width=True):
     ax.legend()
 
     st.pyplot(fig)
-
 
     # ---------------- TOTAL COMPARISON ----------------
     st.subheader("🌍 Total Footprint Comparison")

@@ -94,36 +94,36 @@ if st.button("📊 Calculate Carbon Footprint", use_container_width=True):
     # ---------------- PREDICTIVE MODEL ----------------
     if st.session_state.get("show_prediction", False):
 
-    emissions = st.session_state.emissions
-    total_emissions = st.session_state.total_emissions
+            emissions = st.session_state.emissions
+            total_emissions = st.session_state.total_emissions
+        
+            pred_distance = distance * (1 - reduction_transport / 100)
+            pred_electricity = electricity * (1 - reduction_electricity / 100)
+            pred_meals = meals * (1 - reduction_meals / 100)
+        
+            factors = EMISSION_FACTORS[country]
+        
+            pred_transport = factors["transport"] * pred_distance * 365 / 1000
+            pred_electricity = factors["electricity"] * pred_electricity * 12 / 1000
+            pred_diet = factors["diet"] * pred_meals * 365 / 1000
+        
+            pred_waste = emissions["Waste"]
+        
+            pred_total = round(
+                pred_transport + pred_electricity + pred_diet + pred_waste, 2
+            )
+        
+            reduction_percent = round(
+                ((total_emissions - pred_total) / total_emissions) * 100, 2
+            )
+        
+            st.subheader("🤖 AI Insight")
+            st.success(
+                f"With these changes, you can reduce your annual emissions by "
+                f"**{reduction_percent}%**, saving approximately "
+                f"**{round(total_emissions - pred_total, 2)} tonnes CO₂ per year**."
+            )
 
-    pred_distance = distance * (1 - reduction_transport / 100)
-    pred_electricity = electricity * (1 - reduction_electricity / 100)
-    pred_meals = meals * (1 - reduction_meals / 100)
-
-    factors = EMISSION_FACTORS[country]
-
-    pred_transport = factors["transport"] * pred_distance * 365 / 1000
-    pred_electricity = factors["electricity"] * pred_electricity * 12 / 1000
-    pred_diet = factors["diet"] * pred_meals * 365 / 1000
-
-    # ✅ FIXED
-    pred_waste = emissions["Waste"]
-
-    pred_total = round(
-        pred_transport + pred_electricity + pred_diet + pred_waste, 2
-    )
-
-    reduction_percent = round(
-        ((total_emissions - pred_total) / total_emissions) * 100, 2
-    )
-
-    st.subheader("🤖 AI Insight")
-    st.success(
-        f"With these changes, you can reduce your annual emissions by "
-        f"**{reduction_percent}%**, saving approximately "
-        f"**{round(total_emissions - pred_total, 2)} tonnes CO₂ per year**."
-    )
 
 
 

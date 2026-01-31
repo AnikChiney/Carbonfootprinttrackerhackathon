@@ -87,8 +87,8 @@ if st.button("📊 Calculate Carbon Footprint", use_container_width=True):
     st.divider()
     st.subheader("🔮 Predictive Impact: Lifestyle Changes")
 
-    reduction_transport = st.slider("Reduce daily commute (%)", 0, 50, 10)
-    reduction_electricity = st.slider("Reduce electricity usage (%)", 0, 50, 10)
+    reduction_transport = st.slider("Reduce daily commute (%)", 0, 50, 30)
+    reduction_electricity = st.slider("Reduce electricity usage (%)", 0, 50, 40)
     reduction_meals = st.slider("Reduce high-carbon meals (%)", 0, 50, 10)
 
     # Apply reductions

@@ -85,11 +85,27 @@ if st.button("📊 Calculate Carbon Footprint", use_container_width=True):
 
     # ---------------- PREDICTIVE MODEL ----------------
     st.divider()
-    st.subheader("🔮 Predictive Impact: Lifestyle Changes")
+st.subheader("🔮 Predictive Impact: Lifestyle Changes")
 
-    reduction_transport = st.slider("Reduce daily commute (%)", 0, 50, 30)
-    reduction_electricity = st.slider("Reduce electricity usage (%)", 0, 50, 40)
-    reduction_meals = st.slider("Reduce high-carbon meals (%)", 0, 50, 10)
+# --- Sliders (inputs only) ---
+reduction_transport = st.slider(
+    "Reduce daily commute (%)", 0, 50, 30, key="red_transport"
+)
+reduction_electricity = st.slider(
+    "Reduce electricity usage (%)", 0, 50, 40, key="red_electricity"
+)
+reduction_meals = st.slider(
+    "Reduce high-carbon meals (%)", 0, 50, 10, key="red_meals"
+)
+
+# --- Button to apply scenario ---
+apply_changes = st.button("▶ Apply Lifestyle Changes")
+
+# --- Run only after button click ---
+if apply_changes:
+    st.session_state["show_prediction"] = True
+
+if st.session_state.get("show_prediction", False):
 
     # Apply reductions
     pred_distance = distance * (1 - reduction_transport / 100)
@@ -111,12 +127,14 @@ if st.button("📊 Calculate Carbon Footprint", use_container_width=True):
         ((total_emissions - pred_total) / total_emissions) * 100, 2
     )
 
+    # --- Output ---
     st.subheader("🤖 AI Insight")
-    st.write(
-        f"With these small changes, you can reduce your annual emissions by "
+    st.success(
+        f"With these changes, you can reduce your annual emissions by "
         f"**{reduction_percent}%**, saving approximately "
         f"**{round(total_emissions - pred_total, 2)} tonnes CO₂ per year**."
     )
+
 
     # ---------------- COMPARISON CHART ----------------
     comparison_df = pd.DataFrame({

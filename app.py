@@ -135,21 +135,21 @@ if st.button("📊 Calculate Carbon Footprint", use_container_width=True):
     # ---------------- COMPARISON CHART ----------------
     if st.session_state.prediction:
 
-    comparison_df = pd.DataFrame({
-        "Category": ["Transportation", "Electricity", "Diet", "Waste"],
-        "Current": [
-            st.session_state.emissions["Transportation"],
-            st.session_state.emissions["Electricity"],
-            st.session_state.emissions["Diet"],
-            st.session_state.emissions["Waste"]
-        ],
-        "Predicted": [
-            st.session_state.prediction["breakdown"]["Transportation"],
-            st.session_state.prediction["breakdown"]["Electricity"],
-            st.session_state.prediction["breakdown"]["Diet"],
-            st.session_state.prediction["breakdown"]["Waste"]
-        ]
-    })
+        comparison_df = pd.DataFrame({
+            "Category": ["Transportation", "Electricity", "Diet", "Waste"],
+            "Current": [
+                st.session_state.emissions["Transportation"],
+                st.session_state.emissions["Electricity"],
+                st.session_state.emissions["Diet"],
+                st.session_state.emissions["Waste"]
+            ],
+            "Predicted": [
+                st.session_state.prediction["breakdown"]["Transportation"],
+                st.session_state.prediction["breakdown"]["Electricity"],
+                st.session_state.prediction["breakdown"]["Diet"],
+                st.session_state.prediction["breakdown"]["Waste"]
+            ]
+        })
 
     st.subheader("📊 Current vs Predicted Emissions")
 

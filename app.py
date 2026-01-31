@@ -117,7 +117,7 @@ if st.session_state.get("show_prediction", False):
     pred_transport = factors["transport"] * pred_distance * 365 / 1000
     pred_electricity = factors["electricity"] * pred_electricity * 12 / 1000
     pred_diet = factors["diet"] * pred_meals * 365 / 1000
-    pred_waste = factors["Waste"]  # unchanged
+    pred_waste = factors["waste"]  # unchanged
 
     pred_total = round(
         pred_transport + pred_electricity + pred_diet + pred_waste, 2
